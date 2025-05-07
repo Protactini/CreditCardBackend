@@ -35,8 +35,8 @@ A Spring Boot RESTful API designed to support the CreditCardRec iOS application.
 
 1. Clone the repository:
 
-   git clone https://github.com/yourusername/creditcardrec-api.git  
-   cd creditcardrec-api
+   git clone https://github.com/Protactini/CreditCardBackend.git
+   cd CreditCardBackend
 
 2. Build the project:
 
