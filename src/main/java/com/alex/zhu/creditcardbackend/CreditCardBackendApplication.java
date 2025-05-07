@@ -1,0 +1,13 @@
+package com.alex.zhu.creditcardbackend;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CreditCardBackendApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(CreditCardBackendApplication.class, args);
+    }
+
+}
