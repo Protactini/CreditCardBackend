@@ -91,6 +91,7 @@ mvn test
 
 ## 📁 Project Structure
 
+```
 creditcardrec-api/
 ├── src/
 │ ├── main/
@@ -108,4 +109,5 @@ creditcardrec-api/
 │ └── com.example.creditcardrec/
 ├── pom.xml
 └── README.md
+```
 
