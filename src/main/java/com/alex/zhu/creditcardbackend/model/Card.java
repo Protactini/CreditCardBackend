@@ -2,7 +2,9 @@ package com.alex.zhu.creditcardbackend.model;
 
 import jakarta.persistence.*;
 import java.util.List;
+import lombok.Data;
 
+@Data
 @Entity
 public class Card {
     @Id
@@ -16,6 +18,4 @@ public class Card {
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CashBack> cashBack;
-
-    // getters and setters
 }

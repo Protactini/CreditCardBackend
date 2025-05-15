@@ -1,7 +1,7 @@
 package com.alex.zhu.creditcardbackend.controller;
 
 import com.alex.zhu.creditcardbackend.dto.*;
-import com.alex.zhu.creditcardbackend.CardService;
+import com.alex.zhu.creditcardbackend.service.CardService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
