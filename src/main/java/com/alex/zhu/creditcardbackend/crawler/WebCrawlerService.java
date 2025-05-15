@@ -24,8 +24,8 @@ public class WebCrawlerService {
      * list credit cards with a consistent HTML structure.
      */
     private final List<String> cardUrls = List.of(
-            "https://site1.example.com/cards",
-            "https://site2.example.com/offers"
+            "https://www.discover.com/credit-cards/cash-back/cashback-calendar.html"
+//            "https://site2.example.com/offers"
             // Add additional sources here
     );
 

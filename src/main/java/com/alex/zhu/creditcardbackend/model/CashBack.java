@@ -2,7 +2,9 @@
 package com.alex.zhu.creditcardbackend.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Data
 @Entity
 public class CashBack {
     @Id

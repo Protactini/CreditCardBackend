@@ -2,7 +2,7 @@ package com.alex.zhu.creditcardbackend.model;
 
 import jakarta.persistence.*;
 import java.util.List;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @Entity
