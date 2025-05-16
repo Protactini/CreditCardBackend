@@ -19,7 +19,8 @@ class WebCrawlerServiceTest {
 
     @Test
     void crawlAllCards_returnsNonEmptyList() throws IOException {
-        List<CardWithCashBackDTO> cards = crawler.crawlAllCards();
+        crawler.refreshOnStartup();
+        List<CardWithCashBackDTO> cards = crawler.getAllCardsFromCache();
         assertNotNull(cards, "crawler should never return null");
         assertFalse(cards.isEmpty(), "we expected at least one card from our sites");
         // Optionally inspect first element

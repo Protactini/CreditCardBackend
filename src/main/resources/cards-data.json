@@ -1,0 +1,138 @@
+[
+  {
+    "name": "Chase Freedom Unlimited",
+    "paymentMethod": "VISA",
+    "cashBack": [
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 1.5 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 1.5 },
+      { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 1.5 },
+      { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 3.0 },
+      { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 1.5 },
+      { "area": "Travel",                   "productIcon": "icon6",  "percentage": 5.0 },
+      { "area": "Streaming Services",       "productIcon": "icon7",  "percentage": 1.5 },
+      { "area": "Drugstores",               "productIcon": "icon8",  "percentage": 3.0 },
+      { "area": "Home Improvement Stores",  "productIcon": "icon9",  "percentage": 1.5 },
+      { "area": "Transit & Commuting",      "productIcon": "icon10", "percentage": 1.5 },
+      { "area": "Wholesale Clubs",          "productIcon": "icon11", "percentage": 1.5 }
+    ]
+  },
+  {
+    "name": "Citi Double Cash",
+    "paymentMethod": "MASTERCARD",
+    "cashBack": [
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 2.0 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 2.0 },
+      { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 2.0 },
+      { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 2.0 },
+      { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 2.0 },
+      { "area": "Travel",                   "productIcon": "icon6",  "percentage": 2.0 },
+      { "area": "Streaming Services",       "productIcon": "icon7",  "percentage": 2.0 },
+      { "area": "Drugstores",               "productIcon": "icon8",  "percentage": 2.0 },
+      { "area": "Home Improvement Stores",  "productIcon": "icon9",  "percentage": 2.0 },
+      { "area": "Transit & Commuting",      "productIcon": "icon10", "percentage": 2.0 },
+      { "area": "Wholesale Clubs",          "productIcon": "icon11", "percentage": 2.0 }
+    ]
+  },
+  {
+    "name": "BofA Customized Cash Rewards",
+    "paymentMethod": "VISA",
+    "cashBack": [
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 2.0 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 1.0 },
+      { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 3.0 },
+      { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 3.0 },
+      { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 1.0 },
+      { "area": "Travel",                   "productIcon": "icon6",  "percentage": 1.0 },
+      { "area": "Streaming Services",       "productIcon": "icon7",  "percentage": 3.0 },
+      { "area": "Drugstores",               "productIcon": "icon8",  "percentage": 1.0 },
+      { "area": "Home Improvement Stores",  "productIcon": "icon9",  "percentage": 2.0 },
+      { "area": "Transit & Commuting",      "productIcon": "icon10", "percentage": 1.0 },
+      { "area": "Wholesale Clubs",          "productIcon": "icon11", "percentage": 2.0 }
+    ]
+  },
+  {
+    "name": "Capital One Venture Rewards",
+    "paymentMethod": "VISA",
+    "cashBack": [
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 2.0 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 2.0 },
+      { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 2.0 },
+      { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 2.0 },
+      { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 2.0 },
+      { "area": "Travel",                   "productIcon": "icon6",  "percentage": 5.0 },
+      { "area": "Streaming Services",       "productIcon": "icon7",  "percentage": 2.0 },
+      { "area": "Drugstores",               "productIcon": "icon8",  "percentage": 2.0 },
+      { "area": "Home Improvement Stores",  "productIcon": "icon9",  "percentage": 2.0 },
+      { "area": "Transit & Commuting",      "productIcon": "icon10", "percentage": 5.0 },
+      { "area": "Wholesale Clubs",          "productIcon": "icon11", "percentage": 2.0 }
+    ]
+  },
+  {
+    "name": "Apple Card",
+    "paymentMethod": "MASTERCARD",
+    "cashBack": [
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 2.0 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 2.0 },
+      { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 2.0 },
+      { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 2.0 },
+      { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 2.0 },
+      { "area": "Travel",                   "productIcon": "icon6",  "percentage": 2.0 },
+      { "area": "Streaming Services",       "productIcon": "icon7",  "percentage": 2.0 },
+      { "area": "Drugstores",               "productIcon": "icon8",  "percentage": 2.0 },
+      { "area": "Home Improvement Stores",  "productIcon": "icon9",  "percentage": 2.0 },
+      { "area": "Transit & Commuting",      "productIcon": "icon10", "percentage": 2.0 },
+      { "area": "Wholesale Clubs",          "productIcon": "icon11", "percentage": 2.0 }
+    ]
+  },
+  {
+    "name": "Discover it Cash Back",
+    "paymentMethod": "DISCOVER",
+    "cashBack": [
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 5.0 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 5.0 },
+      { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 1.0 },
+      { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 1.0 },
+      { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 1.0 },
+      { "area": "Travel",                   "productIcon": "icon6",  "percentage": 1.0 },
+      { "area": "Streaming Services",       "productIcon": "icon7",  "percentage": 1.0 },
+      { "area": "Drugstores",               "productIcon": "icon8",  "percentage": 1.0 },
+      { "area": "Home Improvement Stores",  "productIcon": "icon9",  "percentage": 1.0 },
+      { "area": "Transit & Commuting",      "productIcon": "icon10", "percentage": 1.0 },
+      { "area": "Wholesale Clubs",          "productIcon": "icon11", "percentage": 1.0 }
+    ]
+  },
+  {
+    "name": "Amex Blue Cash Preferred",
+    "paymentMethod": "AMEX",
+    "cashBack": [
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 6.0 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 3.0 },
+      { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 1.0 },
+      { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 1.0 },
+      { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 1.0 },
+      { "area": "Travel",                   "productIcon": "icon6",  "percentage": 1.0 },
+      { "area": "Streaming Services",       "productIcon": "icon7",  "percentage": 1.0 },
+      { "area": "Drugstores",               "productIcon": "icon8",  "percentage": 1.0 },
+      { "area": "Home Improvement Stores",  "productIcon": "icon9",  "percentage": 1.0 },
+      { "area": "Transit & Commuting",      "productIcon": "icon10", "percentage": 3.0 },
+      { "area": "Wholesale Clubs",          "productIcon": "icon11", "percentage": 1.0 }
+    ]
+  },
+  {
+    "name": "Wells Fargo Active Cash",
+    "paymentMethod": "VISA",
+    "cashBack": [
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 2.0 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 2.0 },
+      { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 2.0 },
+      { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 2.0 },
+      { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 2.0 },
+      { "area": "Travel",                   "productIcon": "icon6",  "percentage": 2.0 },
+      { "area": "Streaming Services",       "productIcon": "icon7",  "percentage": 2.0 },
+      { "area": "Drugstores",               "productIcon": "icon8",  "percentage": 2.0 },
+      { "area": "Home Improvement Stores",  "productIcon": "icon9",  "percentage": 2.0 },
+      { "area": "Transit & Commuting",      "productIcon": "icon10", "percentage": 2.0 },
+      { "area": "Wholesale Clubs",          "productIcon": "icon11", "percentage": 2.0 }
+    ]
+  }
+]
