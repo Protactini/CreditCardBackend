@@ -3,6 +3,9 @@ package com.alex.zhu.creditcardbackend.crawler;
 
 import com.alex.zhu.creditcardbackend.dto.CardWithCashBackDTO;
 import com.alex.zhu.creditcardbackend.dto.CashBackDTO;
+import org.htmlunit.BrowserVersion;
+import org.htmlunit.WebClient;
+import org.htmlunit.html.HtmlPage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -84,28 +87,52 @@ public class WebCrawlerService {
     /**
      * Crawl a single page, parse its HTML, and return DTOs.
      */
-    private List<CardWithCashBackDTO> parseCardsFrom(String url) throws IOException {
-        Document doc = Jsoup.connect(url)
-                .userAgent("Mozilla/5.0")
-                .timeout(10_000)
-                .get();
-
+    private List<CardWithCashBackDTO> parseCardsFrom(String url) throws IOException{
         List<CardWithCashBackDTO> cards = new ArrayList<>();
-        Elements items = doc.select("div.card-item");
-        for (Element item : items) {
-            String name = item.selectFirst("h3.card-name").text();
-            String paymentMethod = item.selectFirst("span.payment-method").text();
-            List<CashBackDTO> cashList = new ArrayList<>();
-            Elements rows = item.select("ul.cashback-list li");
-            for (Element row : rows) {
-                String area = row.selectFirst("span.area").text();
-                double pct = Double.parseDouble(
-                        row.selectFirst("span.percent").text().replace("%", "")
-                );
-                cashList.add(new CashBackDTO(area, pct));
+
+        // 1) Spin up a headless, JS‑enabled client
+        try (WebClient client = new WebClient(BrowserVersion.CHROME)) {
+            client.getOptions().setCssEnabled(false);
+            client.getOptions().setJavaScriptEnabled(true);
+            client.getOptions().setThrowExceptionOnScriptError(false);
+            client.getOptions().setTimeout(15_000);
+
+            // 2) Fetch & render the page
+            HtmlPage page = client.getPage(url);
+            // wait for the calendar JS to finish loading (adjust as needed)
+            client.waitForBackgroundJavaScript(5_000);
+
+            // 3) Grab the fully rendered HTML
+            String renderedHtml = page.asXml();
+            Document doc = Jsoup.parse(renderedHtml);
+
+            // 4) Now select the calendar quarters and their categories.
+            //    You will need to inspect the rendered DOM to pick the right selectors.
+            //    Here’s a hypothetical example:
+            Elements quarters = doc.select("div.CalendarQuarter"); // e.g. one per Q1/Q2/Q3/Q4
+            for (Element quarter : quarters) {
+                // e.g. <h3 class="quarter-title">Q2 2025 – Grocery Stores & Wholesale Clubs</h3>
+                String quarterTitle = quarter.selectFirst("h3.quarter-title").text();
+                // Assume the category text comes immediately after “– ”
+                String categoryNames = quarterTitle.substring(quarterTitle.indexOf("–") + 1).trim();
+
+                // Split multiple categories by “ & ” or comma
+                String[] areas = categoryNames.split("\\s*(&|,)\\s*");
+                for (String area : areas) {
+                    double pct = 5.0;  // always 5% on those categories
+                    cards.add(new CardWithCashBackDTO(
+                            null,
+                            "Discover it Cash Back",          // hard‑coded card name
+                            "DISCOVER",
+                            List.of(new CashBackDTO(area, pct))
+                    ));
+                }
             }
-            cards.add(new CardWithCashBackDTO(null, name, paymentMethod, cashList));
+        } catch (Exception e) {
+            // Log & recover
+            System.err.println("Failed to parse Discover calendar: " + e.getMessage());
         }
+
         return cards;
     }
 }
