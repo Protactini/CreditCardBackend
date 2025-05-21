@@ -2,14 +2,8 @@
 package com.alex.zhu.creditcardbackend.crawler;
 
 import com.alex.zhu.creditcardbackend.dto.CardWithCashBackDTO;
-import com.alex.zhu.creditcardbackend.dto.CashBackDTO;
-import org.htmlunit.BrowserVersion;
-import org.htmlunit.WebClient;
-import org.htmlunit.html.HtmlPage;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -20,28 +14,34 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Crawls external pages for card data, caches the result in memory,
- * and refreshes on startup + every Monday at 2:00 AM.
+ * Service that orchestrates crawling of external pages for card data,
+ * caches the result in memory, and refreshes on startup + every Monday at 2 AM.
  */
 @Service
 public class WebCrawlerService {
 
-    /**
-     * URLs to crawl. One per issuer or per page that lists multiple cards.
-     */
+    private static final Logger logger = LoggerFactory.getLogger(WebCrawlerService.class);
+
+    /** URLs to crawl. One per issuer/page that lists multiple cards. */
     private final List<String> cardUrls = List.of(
             "https://www.discover.com/credit-cards/cash-back/cashback-calendar.html"
             // add other issuer pages here
     );
 
-    /**
-     * In‑memory cache of the last crawl.
-     */
-    private final AtomicReference<List<CardWithCashBackDTO>> cache =
-            new AtomicReference<>(List.of());
+    /** In-memory cache holding the last successful crawl result. */
+    private final AtomicReference<List<CardWithCashBackDTO>> cache = new AtomicReference<>(List.of());
+
+    private final WebCrawlerRepo webCrawlerRepo;
 
     /**
-     * Called once after the bean is constructed (i.e. on startup).
+     * Injects the repo that knows how to parse each site’s HTML.
+     */
+    public WebCrawlerService(WebCrawlerRepo webCrawlerRepo) {
+        this.webCrawlerRepo = webCrawlerRepo;
+    }
+
+    /**
+     * Prime the cache once on startup.
      */
     @PostConstruct
     public void refreshOnStartup() {
@@ -49,9 +49,9 @@ public class WebCrawlerService {
     }
 
     /**
-     * Cron expression: every Monday at 02:00.
-     * ──────────────────────────────────────────
-     *   second minute hour day-of-month month day-of-week
+     * Every Monday at 02:00 AM, re-crawl and refresh the cache.
+     *
+     * Cron format: second minute hour day-of-month month day-of-week
      */
     @Scheduled(cron = "0 0 2 * * MON")
     public void refreshEveryMonday() {
@@ -59,80 +59,26 @@ public class WebCrawlerService {
     }
 
     /**
-     * Public method for controllers to get the latest cached cards.
+     * Returns the most recently cached cards for controllers to serve.
      */
     public List<CardWithCashBackDTO> getAllCardsFromCache() {
         return cache.get();
     }
 
-    // ──────────────── internal ─────────────────
-
     /**
-     * Crawl all URLs, parse, and update the in‑memory cache.
+     * Internal: crawl all URLs and update the in-memory cache.
+     * On failure, logs the error but retains the last known good cache.
      */
     private void refreshCache() {
         try {
             List<CardWithCashBackDTO> result = new ArrayList<>();
             for (String url : cardUrls) {
-                result.addAll(parseCardsFrom(url));
+                result.addAll(webCrawlerRepo.parseCardsFromForDiscover(url));
             }
             cache.set(result);
-            System.out.println("WebCrawlerService: cache refreshed with " + result.size() + " cards");
+            logger.info("Cache refreshed: {} cards loaded", result.size());
         } catch (IOException e) {
-            // handle or log the error (don’t overwrite cache on failure)
-            System.err.println("WebCrawlerService: failed to refresh cache: " + e.getMessage());
+            logger.error("Failed to refresh cache, keeping previous data", e);
         }
-    }
-
-    /**
-     * Crawl a single page, parse its HTML, and return DTOs.
-     */
-    private List<CardWithCashBackDTO> parseCardsFrom(String url) throws IOException{
-        List<CardWithCashBackDTO> cards = new ArrayList<>();
-
-        // 1) Spin up a headless, JS‑enabled client
-        try (WebClient client = new WebClient(BrowserVersion.CHROME)) {
-            client.getOptions().setCssEnabled(false);
-            client.getOptions().setJavaScriptEnabled(true);
-            client.getOptions().setThrowExceptionOnScriptError(false);
-            client.getOptions().setTimeout(15_000);
-
-            // 2) Fetch & render the page
-            HtmlPage page = client.getPage(url);
-            // wait for the calendar JS to finish loading (adjust as needed)
-            client.waitForBackgroundJavaScript(5_000);
-
-            // 3) Grab the fully rendered HTML
-            String renderedHtml = page.asXml();
-            Document doc = Jsoup.parse(renderedHtml);
-
-            // 4) Now select the calendar quarters and their categories.
-            //    You will need to inspect the rendered DOM to pick the right selectors.
-            //    Here’s a hypothetical example:
-            Elements quarters = doc.select("div.CalendarQuarter"); // e.g. one per Q1/Q2/Q3/Q4
-            for (Element quarter : quarters) {
-                // e.g. <h3 class="quarter-title">Q2 2025 – Grocery Stores & Wholesale Clubs</h3>
-                String quarterTitle = quarter.selectFirst("h3.quarter-title").text();
-                // Assume the category text comes immediately after “– ”
-                String categoryNames = quarterTitle.substring(quarterTitle.indexOf("–") + 1).trim();
-
-                // Split multiple categories by “ & ” or comma
-                String[] areas = categoryNames.split("\\s*(&|,)\\s*");
-                for (String area : areas) {
-                    double pct = 5.0;  // always 5% on those categories
-                    cards.add(new CardWithCashBackDTO(
-                            null,
-                            "Discover it Cash Back",          // hard‑coded card name
-                            "DISCOVER",
-                            List.of(new CashBackDTO(area, pct))
-                    ));
-                }
-            }
-        } catch (Exception e) {
-            // Log & recover
-            System.err.println("Failed to parse Discover calendar: " + e.getMessage());
-        }
-
-        return cards;
     }
 }
