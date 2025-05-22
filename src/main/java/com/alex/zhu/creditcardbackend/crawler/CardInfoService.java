@@ -18,13 +18,13 @@ import java.util.concurrent.atomic.AtomicReference;
  * caches the result in memory, and refreshes on startup + every Monday at 2 AM.
  */
 @Service
-public class WebCrawlerService {
+public class CardInfoService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebCrawlerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CardInfoService.class);
 
     /** URLs to crawl. One per issuer/page that lists multiple cards. */
     private final List<String> cardUrls = List.of(
-            "https://www.discover.com/credit-cards/cash-back/cashback-calendar.html"
+            "https://card.discover.com/cardissuer/public/rewards/offer/v1/offer-categories?_=1747952418206" // Discover Card quarter cashback
             // add other issuer pages here
     );
 
@@ -36,7 +36,7 @@ public class WebCrawlerService {
     /**
      * Injects the repo that knows how to parse each site’s HTML.
      */
-    public WebCrawlerService(WebCrawlerRepo webCrawlerRepo) {
+    public CardInfoService(WebCrawlerRepo webCrawlerRepo) {
         this.webCrawlerRepo = webCrawlerRepo;
     }
 
@@ -73,7 +73,7 @@ public class WebCrawlerService {
         try {
             List<CardWithCashBackDTO> result = new ArrayList<>();
             for (String url : cardUrls) {
-                result.addAll(webCrawlerRepo.parseCardsFromForDiscover(url));
+                result.add(webCrawlerRepo.parseCardsFromForDiscover(url));
             }
             cache.set(result);
             logger.info("Cache refreshed: {} cards loaded", result.size());

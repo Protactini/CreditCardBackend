@@ -1,6 +1,5 @@
 package com.alex.zhu.creditcardbackend.crawler;
 
-import com.alex.zhu.creditcardbackend.crawler.WebCrawlerService;
 import com.alex.zhu.creditcardbackend.dto.CardWithCashBackDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +11,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class WebCrawlerServiceTest {
+class CardInfoServiceTest {
 
     @Autowired
-    private WebCrawlerService crawler;
+    private CardInfoService crawler;
 
     @Test
     void crawlAllCards_returnsNonEmptyList() throws IOException {
