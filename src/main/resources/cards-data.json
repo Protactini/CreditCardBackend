@@ -88,8 +88,8 @@
     "name": "Discover it Cash Back",
     "paymentMethod": "DISCOVER",
     "cashBack": [
-      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 5.0 },
-      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 5.0 },
+      { "area": "Grocery Stores",           "productIcon": "icon1",  "percentage": 1.0 },
+      { "area": "Gas Stations",             "productIcon": "icon2",  "percentage": 1.0 },
       { "area": "EV Charging",              "productIcon": "icon3",  "percentage": 1.0 },
       { "area": "Dining & Restaurants",     "productIcon": "icon4",  "percentage": 1.0 },
       { "area": "Online Shopping",          "productIcon": "icon5",  "percentage": 1.0 },

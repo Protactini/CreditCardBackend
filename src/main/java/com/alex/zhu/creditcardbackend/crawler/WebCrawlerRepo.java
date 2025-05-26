@@ -115,21 +115,23 @@ public class WebCrawlerRepo {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH);
         LocalDate today = LocalDate.now();
         for (DiscoverResponse.Quarter q : resp.getQuarters()) {
-            LocalDate start = LocalDate.parse(q.getQuarterLabelStartDate(), fmt);
-            LocalDate end   = LocalDate.parse(q.getQuarterLabelEndDate(),   fmt);
-            if (!today.isBefore(start) && !today.isAfter(end)) {
-                // 4) Split title into areas
-                String[] areas = q.getTitle().split("\\s*,\\s*|\\s+and\\s+");
-                List<CashBackDTO> cashList = new ArrayList<>();
-                for (String area : areas) {
-                    cashList.add(new CashBackDTO(area.trim(), 5.0));
+            if (!q.getOfferStatus().equals("expired")) {
+                LocalDate start = LocalDate.parse(q.getQuarterLabelStartDate(), fmt);
+                LocalDate end   = LocalDate.parse(q.getQuarterLabelEndDate(),   fmt);
+                if (!today.isBefore(start) && !today.isAfter(end)) {
+                    // 4) Split title into areas
+                    String[] areas = q.getTitle().split("\\s*,\\s*|\\s+and\\s+");
+                    List<CashBackDTO> cashList = new ArrayList<>();
+                    for (String area : areas) {
+                        cashList.add(new CashBackDTO(area.trim(), 5.0));
+                    }
+                    return new CardWithCashBackDTO(
+                            null,
+                            "Discover it Cash Back",
+                            "DISCOVER",
+                            cashList
+                    );
                 }
-                return new CardWithCashBackDTO(
-                        null,
-                        "Discover it Cash Back",
-                        "DISCOVER",
-                        cashList
-                );
             }
         }
 

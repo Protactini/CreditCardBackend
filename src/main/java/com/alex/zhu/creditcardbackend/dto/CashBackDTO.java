@@ -1,4 +1,11 @@
 package com.alex.zhu.creditcardbackend.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public record CashBackDTO(String area, double percentage) { }
+@Data
+@AllArgsConstructor
+public class CashBackDTO {
+    String area;
+    double percentage;
+}
