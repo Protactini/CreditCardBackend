@@ -7,7 +7,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 public interface CashBackRepository extends JpaRepository<CashBack, Long> {
+
+    Optional<CashBack> findByCardIdAndArea(Long cardId, String area);
+
 
     /**
      * Deletes all CashBack entries belonging to the given Card ID.

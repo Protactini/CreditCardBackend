@@ -2,7 +2,6 @@
 package com.alex.zhu.creditcardbackend.crawler;
 
 import com.alex.zhu.creditcardbackend.dto.*;
-import com.alex.zhu.creditcardbackend.model.*;
 import com.alex.zhu.creditcardbackend.repository.*;
 
 import org.slf4j.Logger;
@@ -13,9 +12,6 @@ import jakarta.annotation.PostConstruct;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -55,65 +51,22 @@ public class CardInfoService {
      * 2) On any IOException → fall back to DB load
      * 3) Update in-memory cache
      */
+    /** Crawl, normalize, upsert, and log results */
     public void refreshCache() {
         List<CardWithCashBackDTO> dtos = new ArrayList<>();
-        try {
-            for (String url : companyUrls) {
-                CardWithCashBackDTO dto = webCrawlerRepo.parseCardsFromForDiscover(url);
-                upsertCardData(dto);
-                dtos.add(dto);
+        for (String url : companyUrls) {
+            try {
+                // 1) Fetch raw DTO
+                CardWithCashBackDTO rawDto = webCrawlerRepo.parseCardsFromForDiscover(url);
+                // 2) Normalize area names
+                CardWithCashBackDTO normalized = CardDataProcessor.regulateAreas(rawDto);
+                // 3) Upsert into DB
+                CardDataProcessor.upsertCardData(normalized, cardRepo, cashRepo);
+                dtos.add(normalized);
+            } catch (IOException e) {
+                logger.error("Failed to crawl {}: {}", url, e.getMessage());
             }
-            logger.info("Cache refreshed via crawl: {} entries", dtos.size());
-        } catch (IOException ex) {
-            logger.error("Crawl failed—falling back to DB", ex);
-//            List<CardWithCashBackDTO> fallback = loadFromDatabase();
-//            logger.info("Cache populated from DB: {} entries", fallback.size());
         }
-    }
-
-    /**
-     * Map DB rows to DTOs.
-     */
-    @Transactional(readOnly = true)
-    protected List<CardWithCashBackDTO> loadFromDatabase() {
-        return cardRepo.findAll().stream().map(card -> {
-            List<CashBackDTO> list = card.getCashBack().stream()
-                    .map(cb -> new CashBackDTO(cb.getArea(), cb.getPercentage()))
-                    .collect(Collectors.toList());
-            return new CardWithCashBackDTO(
-                    card.getId(),
-                    card.getName(),
-                    card.getPaymentMethod().name(),
-                    list
-            );
-        }).collect(Collectors.toList());
-    }
-
-    /**
-     * Upsert a single card and its cashback rows:
-     * - findByName or create new
-     * - delete old CashBack by cardId
-     * - save new CashBack entries
-     */
-    private void upsertCardData(CardWithCashBackDTO dto) {
-        // 1) find or create
-        Card card = cardRepo.findByName(dto.getName())
-                .orElseGet(() -> {
-                    Card c = new Card();
-                    c.setName(dto.getName());
-                    return c;
-                });
-
-        // 2) clear old cashback rows
-        cashRepo.deleteByCardId(card.getId());
-
-        // 3) insert fresh rows
-        dto.getCashBackList().forEach(cbDto -> {
-            var cb = new CashBack();
-            cb.setArea(cbDto.getArea());
-            cb.setPercentage(cbDto.getPercentage());
-            cb.setCard(card);
-            cashRepo.save(cb);
-        });
+        logger.info("Cache refreshed via crawl: {} entries", dtos.size());
     }
 }

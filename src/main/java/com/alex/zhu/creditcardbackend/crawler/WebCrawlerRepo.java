@@ -35,10 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Repository-style component that knows how to fetch and parse
  * pages for each issuer’s HTML format.
