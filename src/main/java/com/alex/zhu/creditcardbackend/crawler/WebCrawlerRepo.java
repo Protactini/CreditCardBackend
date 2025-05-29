@@ -135,4 +135,53 @@ public class WebCrawlerRepo {
         logger.warn("No active Discover quarter found for date {}", today);
         return new CardWithCashBackDTO(null, "Discover it Cash Back", "DISCOVER", List.of());
     }
+
+    public CardWithCashBackDTO parseCardsFromForFreedom(String url) throws IOException {
+        // 1) GET JSON
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Accept", "application/json")
+                .GET().build();
+
+        String body;
+        try {
+            body = client.send(req, HttpResponse.BodyHandlers.ofString()).body();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Interrupted fetching Discover JSON", e);
+        }
+
+        // 2) Deserialize
+        ObjectMapper mapper = new ObjectMapper();
+        DiscoverResponse resp = mapper.readValue(body, DiscoverResponse.class);
+
+        // 3) Find current quarter
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH);
+        LocalDate today = LocalDate.now();
+        for (DiscoverResponse.Quarter q : resp.getQuarters()) {
+            if (!q.getOfferStatus().equals("expired")) {
+                LocalDate start = LocalDate.parse(q.getQuarterLabelStartDate(), fmt);
+                LocalDate end   = LocalDate.parse(q.getQuarterLabelEndDate(),   fmt);
+                if (!today.isBefore(start) && !today.isAfter(end)) {
+                    // 4) Split title into areas
+                    String[] areas = q.getTitle().split("\\s*,\\s*|\\s+and\\s+");
+                    List<CashBackDTO> cashList = new ArrayList<>();
+                    for (String area : areas) {
+                        cashList.add(new CashBackDTO(area.trim(), 5.0));
+                    }
+                    return new CardWithCashBackDTO(
+                            null,
+                            "Discover it Cash Back",
+                            "DISCOVER",
+                            cashList
+                    );
+                }
+            }
+        }
+
+        // none matched → return empty DTO
+        logger.warn("No active Discover quarter found for date {}", today);
+        return new CardWithCashBackDTO(null, "Discover it Cash Back", "DISCOVER", List.of());
+    }
 }

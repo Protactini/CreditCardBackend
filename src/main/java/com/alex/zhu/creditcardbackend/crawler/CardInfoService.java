@@ -19,8 +19,18 @@ public class CardInfoService {
 
     private static final Logger logger = LoggerFactory.getLogger(CardInfoService.class);
 
-    private final List<String> companyUrls = List.of(
-            "https://card.discover.com/cardissuer/public/rewards/offer/v1/offer-categories?_=1747952418206"  // your JSON endpoints
+    private final Map<RotatingBonesCards, String> cardUrls = Map.of(
+            /**
+             * Discover it endpoint
+             */
+            RotatingBonesCards.DiscoverIt,
+            "https://card.discover.com/cardissuer/public/rewards/offer/v1/offer-categories?_=1747952418206",
+
+            /**
+             * Chase Freedom Flex cash back
+             */
+            RotatingBonesCards.ChaseFreedomFlex,
+            "https://creditcards.chase.com/cash-back-credit-cards/freedom/flex"
             // add more issuer URLs here
     );
 
@@ -54,18 +64,22 @@ public class CardInfoService {
     /** Crawl, normalize, upsert, and log results */
     public void refreshCache() {
         List<CardWithCashBackDTO> dtos = new ArrayList<>();
-        for (String url : companyUrls) {
-            try {
-                // 1) Fetch raw DTO
-                CardWithCashBackDTO rawDto = webCrawlerRepo.parseCardsFromForDiscover(url);
-                // 2) Normalize area names
-                CardWithCashBackDTO normalized = CardDataProcessor.regulateAreas(rawDto);
-                // 3) Upsert into DB
-                CardDataProcessor.upsertCardData(normalized, cardRepo, cashRepo);
-                dtos.add(normalized);
-            } catch (IOException e) {
-                logger.error("Failed to crawl {}: {}", url, e.getMessage());
-            }
+        // 1) Fetch raw DTO
+        try {
+            CardWithCashBackDTO rawDiscoverDto = webCrawlerRepo.parseCardsFromForDiscover(cardUrls.get(RotatingBonesCards.DiscoverIt));
+            dtos.add(rawDiscoverDto);
+
+            CardWithCashBackDTO rawFreedomDto = webCrawlerRepo.parseCardsFromForFreedom(cardUrls.get(RotatingBonesCards.ChaseFreedomFlex));
+            dtos.add(rawFreedomDto);
+        } catch (IOException e) {
+            logger.error("Failed to crawl {}: {}", "cardUrls", e.getMessage());
+        }
+
+        for(CardWithCashBackDTO dto : dtos) {
+            // 2) Normalize area names
+            CardWithCashBackDTO normalized = CardDataProcessor.regulateAreas(dto);
+            // 3) Upsert into DB
+            CardDataProcessor.upsertCardData(normalized, cardRepo, cashRepo);
         }
         logger.info("Cache refreshed via crawl: {} entries", dtos.size());
     }
