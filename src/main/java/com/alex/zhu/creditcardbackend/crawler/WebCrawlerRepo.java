@@ -25,6 +25,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,52 +137,68 @@ public class WebCrawlerRepo {
         return new CardWithCashBackDTO(null, "Discover it Cash Back", "DISCOVER", List.of());
     }
 
+    /**
+     * Crawls the Chase Freedom Flex page, reads the
+     * “at a glance” cash-back rates, and returns a DTO.
+     *
+     * @param url the Chase Freedom Flex URL
+     * @return a single CardWithCashBackDTO with the static rates
+     * @throws IOException on fetch or parse errors
+     */
     public CardWithCashBackDTO parseCardsFromForFreedom(String url) throws IOException {
-        // 1) GET JSON
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Accept", "application/json")
-                .GET().build();
+        // 1) Fetch & parse the page
+        Document doc = Jsoup.connect(url)
+                .userAgent("Mozilla/5.0")
+                .timeout(10_000)
+                .get();
 
-        String body;
-        try {
-            body = client.send(req, HttpResponse.BodyHandlers.ofString()).body();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Interrupted fetching Discover JSON", e);
-        }
+        // find all quarter panels
+        Elements quarterPanels = doc.select("div.cmp-cashback-calendar__quarter");
 
-        // 2) Deserialize
-        ObjectMapper mapper = new ObjectMapper();
-        DiscoverResponse resp = mapper.readValue(body, DiscoverResponse.class);
+        Month now = LocalDate.now().getMonth();
+        for (Element qp : quarterPanels) {
+            // e.g. "January – March"
+            String range = qp.selectFirst("h4").text();
+            if (!isCurrentQuarter(range, now)) continue;
 
-        // 3) Find current quarter
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH);
-        LocalDate today = LocalDate.now();
-        for (DiscoverResponse.Quarter q : resp.getQuarters()) {
-            if (!q.getOfferStatus().equals("expired")) {
-                LocalDate start = LocalDate.parse(q.getQuarterLabelStartDate(), fmt);
-                LocalDate end   = LocalDate.parse(q.getQuarterLabelEndDate(),   fmt);
-                if (!today.isBefore(start) && !today.isAfter(end)) {
-                    // 4) Split title into areas
-                    String[] areas = q.getTitle().split("\\s*,\\s*|\\s+and\\s+");
-                    List<CashBackDTO> cashList = new ArrayList<>();
-                    for (String area : areas) {
-                        cashList.add(new CashBackDTO(area.trim(), 5.0));
-                    }
-                    return new CardWithCashBackDTO(
-                            null,
-                            "Discover it Cash Back",
-                            "DISCOVER",
-                            cashList
-                    );
-                }
+            // the bonus-text is sibling inside the same container
+            Element container = qp.closest("div.cmp-cashback-calendar__benifits-slide-description");
+            String raw = container.selectFirst("div.bonus-text b").text();
+            String[] areas = raw.split("\\s*\\|\\s*");
+
+            List<CashBackDTO> cashList = new ArrayList<>();
+            for (String area : areas) {
+                cashList.add(new CashBackDTO(area.trim(), 5.0));
             }
+
+            return new CardWithCashBackDTO(
+                    null,
+                    "Chase Freedom Flex",
+                    "VISA",
+                    cashList
+            );
         }
 
-        // none matched → return empty DTO
-        logger.warn("No active Discover quarter found for date {}", today);
-        return new CardWithCashBackDTO(null, "Discover it Cash Back", "DISCOVER", List.of());
+        // fallback if no current quarter found
+        return new CardWithCashBackDTO(
+                null,
+                "Chase Freedom Flex",
+                "VISA",
+                List.of()
+        );
+    }
+
+    /**
+     * Parses a string like "January – March" and returns true if
+     * the given Month falls between (inclusive).
+     */
+    private boolean isCurrentQuarter(String range, Month now) {
+        String[] parts = range.split("\\s*[–-]\\s*");
+        if (parts.length != 2) return false;
+
+        Month start = Month.valueOf(parts[0].trim().toUpperCase());
+        Month end   = Month.valueOf(parts[1].trim().toUpperCase());
+        int m = now.getValue();
+        return m >= start.getValue() && m <= end.getValue();
     }
 }
